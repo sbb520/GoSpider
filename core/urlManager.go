@@ -1,4 +1,4 @@
-package main
+package core
 
 import (
 	"fmt"
@@ -22,7 +22,7 @@ func NewUrlManager() *urlManager {
     
 }
 
-func (u *urlManager) addNewUrl(url string) error {
+func (u *urlManager) AddNewUrl(url string) error {
 	if url == "" {
 		return fmt.Errorf("%s", "error")
 	}
@@ -31,23 +31,23 @@ func (u *urlManager) addNewUrl(url string) error {
 	return nil
 }
 
-func (u *urlManager) addNewUrls(urls []string) error {
+func (u *urlManager) AddNewUrls(urls []string) error {
 	for _, url := range urls {
 		if url == "" {
 			return fmt.Errorf("%s", "error")
 		}
-		u.addNewUrl(url)
+		u.AddNewUrl(url)
 	}
 	return nil
 }
 
 
-func (u *urlManager) hasNewUrl() bool {
+func (u *urlManager) HasNewUrl() bool {
 	return len(u.NewUrls) != 0
 }
 
-func (u *urlManager) getNewUrl() (string, error){
-	if !u.hasNewUrl() {
+func (u *urlManager) GetNewUrl() (string, error){
+	if !u.HasNewUrl() {
 		return "", fmt.Errorf("%s", "didn't have index")
 	}
 	url := u.NewUrls[u.oldIndex]

@@ -2,37 +2,36 @@ package main
 
 import (
 	"fmt"
+	"GoSpider/core"
 )
 
 func main() {
-	rootUrl := "http://www.18yyyy.com/htm/2018/4/4/t01/404695.html"
+	rootUrl := "http://www.18yyyy.com/htm/2018/4/4/t01/404693.html"
 
-
-	urlManager := NewUrlManager()
-	htmlDownloader := NewHtmlDownloader()
-	htmlParser := NewHtmlParser()
+	urlManager := core.NewUrlManager()
+	downloader := core.NewDownloader()
+	parser := core.NewParser()
 
 	// 导入根url
-	urlManager.addNewUrl(rootUrl)
+	urlManager.AddNewUrl(rootUrl)
 
 	for i := 0; i < 2; i++ {
-		url, err :=urlManager.getNewUrl()
+		url, err :=urlManager.GetNewUrl()
 		if err != nil {
 			panic(err)
 		}
 		// 下载url里的内容
-		res, err := htmlDownloader.download(url)
+		body, err := downloader.Download(url)
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println(url)
-		htmlParser.setUrlDetail(url)
-		// 解析网页内容
-		newUrl, _ := htmlParser.getNewUrls(res)
-		body, _ := htmlParser.getNewData(res)
-		urlManager.addNewUrl(newUrl)
-		fmt.Println(body)
-		break
+		// 解析数据
+		parser.Init(body, url)
+		data := parser.GetParaseData()
+		// 添加下一页的url
+		urlManager.AddNewUrl(data.NextUrl)
+		// 
+		fmt.Println(data.Data)
 	}
 	
 	

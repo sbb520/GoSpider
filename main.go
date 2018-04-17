@@ -15,7 +15,7 @@ func main() {
 	// 导入根url
 	urlManager.AddNewUrl(rootUrl)
 
-	for i := 0; i < 2; i++ {
+	for  {
 		url, err :=urlManager.GetNewUrl()
 		if err != nil {
 			panic(err)

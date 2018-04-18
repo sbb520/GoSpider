@@ -13,3 +13,13 @@ go：1.6.2
 [1]: ./doc/img/1.svg
 
 [50]: https://github.com/PuerkitoBio/goquery
+
+## 运行方式
+```
+./test.sh
+```
+
+## 版本
+### v1.0
+引入爬虫的四大模块：URL管理器，HTML下载器，HTML解析器，持久化模块。
+此版本的爬虫是简单的循环爬虫模式，不涉及到多线程。

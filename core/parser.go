@@ -1,107 +1,80 @@
 package core
 
-import(
-	// "github.com/anaskhan96/soup"
-	"io"
+import (
 	"fmt"
-	"strings"
-	"github.com/PuerkitoBio/goquery"
+	"net/http"
+	// "io"
+
+	// "strings"
 	"GoSpider/model"
+
+	"github.com/PuerkitoBio/goquery"
 )
 
-type parser struct {
-	// 根url
-	// 协议
-	// 解析字符串
-	// 解析的内容
-	domain string
-	protocol string
-	body string
-	url string
-	doc *goquery.Document
-	ParaseData *model.ParaseData
+type Parser struct {
+	resp *http.Response    // http response
+	doc  *goquery.Document // 解析后的dom对象
+	// ParaseData *model.ParaseData	// 解析后数据存储的对象
 }
 
 // 构造函数
-func NewParser() *parser {
-	h := new(parser)
-	h.ParaseData = new(model.ParaseData)
-	
+func NewParser() *Parser {
+	h := new(Parser)
 	return h
 }
 
-func (h *parser) Init(data io.ReadCloser, url string) {
-	h.url = url
-	h.HtmlParse(data) // 解析url下的数据
-	h.SetUrlDetail(url) // 解析url的域名
-
-	h.SetNewData() //
-	h.SetNewUrls()
-	h.SetTitle()
-	h.SetUrl()
-}
-
 // 解析html节点
-func (h *parser) HtmlParse(data io.ReadCloser) error{
-	defer data.Close()
+func (h *Parser) HtmlParse(resp *http.Response) error {
+	defer resp.Body.Close()
 	var err error
-	h.doc, err = goquery.NewDocumentFromReader(data)
-	
+	h.doc, err = goquery.NewDocumentFromReader(resp.Body)
+	h.resp = resp
 	return err
 }
 
-// 获取domain和protocol
-func (h *parser) SetUrlDetail(url string) error{
-	index := strings.Index(url, "//")
-	h.protocol = url[:index-1]
-
-	urlOffHttp := url[index+2:]
-	end := strings.Index(urlOffHttp, "/")
-	h.domain = urlOffHttp[:end]
-
-	return nil
+// 解析文章内容
+func (h *Parser) ArticleParse() (*model.Article, error) {
+	article := new(model.Article)
+	article.Body = h.doc.Find("div#view2").Text()
+	article.Title = h.doc.Find("title").Text()
+	article.Url = h.resp.Request.URL.RequestURI()
+	return article, nil
 }
 
-// 解析出下一个新的url
-func (h *parser) SetNewUrls () (error) {
+func (h *Parser) PageParse() (*model.Page, error) {
+	page := new(model.Page)
+	page.Urls = make([]string, 30)
+	h.doc.Find("body .typelist ul").Each(func(i int, s *goquery.Selection) {
+		url, exists := s.Find("li a").Attr("href")
+		if !exists {
+			return
+		}
+		fullUrl, err := h.resp.Request.URL.Parse(url)
+		fmt.Println(fullUrl)
+		if err != nil {
+			return
+		}
+		page.Urls = append(page.Urls, fullUrl.String())
+	})
 
-	nextUrl, err := h.doc.Find("li.next").Find("a").Attr("href")
-	fmt.Println(err)
+	h.doc.Find("body #page a.PageBox").Each(func(i int, s *goquery.Selection) {
+		title, _ := s.Attr("title")
+		if title != "下一页" {
+			return
+		}
 
-	if string(nextUrl[0]) == "/" {
-		nextUrl = h.protocol + "://" + h.domain + nextUrl
-	} 
-	h.ParaseData.NextUrl = nextUrl
-	return nil
+		url, exists := s.Attr("href")
+		fmt.Println(url)
+		if !exists {
+			panic("没有最后一页了")
+		}
+		fullUrl, err := h.resp.Request.URL.Parse(url)
+		fmt.Println(fullUrl)
+		if err != nil {
+			return
+		}
+		page.NextPage = fullUrl.String()
+	})
+
+	return page, nil
 }
-
-// 解析出数据
-func (h *parser) SetNewData () (error) {
-	body := h.doc.Find("div#view2").Text()
-	h.ParaseData.Data = body
-	return nil
-}
-
-// 解析出当前的标题
-func (h *parser) SetTitle() error{
-	title := h.doc.Find("title").Text()
-	h.ParaseData.Title = title
-	
-	return nil
-}
-
-// 
-func (h *parser) SetUrl() {
-	h.ParaseData.Url = h.url
-}
-
-// 获取解析后的数据
-func (h *parser) GetParaseData() *model.ParaseData{
-	return h.ParaseData
-}
-
-
-
-
-
-

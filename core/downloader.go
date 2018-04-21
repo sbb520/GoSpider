@@ -2,7 +2,7 @@ package core
 
 import(
 	"net/http"
-	"io"
+	// "io"
 	"fmt"
 )
 
@@ -15,7 +15,7 @@ func NewDownloader () *downloader {
 	return h
 }
 
-func (h *downloader) Download(url string) (io.ReadCloser, error) {
+func (h *downloader) Download(url string) (*http.Response, error) {
 	resp, err := http.Get(url)
 	
     if err != nil {
@@ -26,5 +26,5 @@ func (h *downloader) Download(url string) (io.ReadCloser, error) {
         return nil, fmt.Errorf("%s %d", "error status", &resp.StatusCode)
 	} 
     
-    return resp.Body, nil
+    return resp, nil
 }

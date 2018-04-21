@@ -10,20 +10,32 @@ go：1.6.2
 
 其中goquery是一个go的解析html的第三方工具，类似于jquery一样的dom操作，当然你也可以使用go官方的扩展包golang.org/x/net/html来进行解析。
 
-[1]: ./doc/img/1.svg
 
-[50]: https://github.com/PuerkitoBio/goquery
 
-## 运行方式
+## 运行方法
 ```
 go get github.com/PuerkitoBio/goquery
 ./test.sh
+
+# 或直接运行二进制文件
+./GoSpider
 ```
+
+## 效果图
+![][2]  
+![][3]
 
 ## 版本
 ### v1.0
-引入爬虫的四大模块：URL管理器，HTML下载器，HTML解析器，持久化模块。
+引入爬虫的四大模块：URL管理器，HTML下载器，HTML解析器，持久化模块，由于单纯作为本人测试以及yy，暂不做数据保存...  
 此版本的爬虫是简单的循环爬虫模式，不涉及到多线程。
 
 ### v2.0
 引入多线程爬虫，开启20个下载解析的Goroutines，爬取速度提升接近20倍，小网站的某系列小说3000篇，在大概3分钟左右全部爬取完毕。
+
+
+[1]: ./doc/img/1.svg
+[2]: ./doc/img/run1.png
+[3]: ./doc/img/run2.png
+
+[50]: https://github.com/PuerkitoBio/goquery

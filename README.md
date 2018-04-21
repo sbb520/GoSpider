@@ -35,7 +35,7 @@ go get github.com/PuerkitoBio/goquery
 
 
 [1]: ./doc/img/1.svg
-[2]: ./doc/img/run1.png
-[3]: ./doc/img/run2.png
+[2]: ./doc/img/run1.jpg
+[3]: ./doc/img/run2.jpg
 
 [50]: https://github.com/PuerkitoBio/goquery
